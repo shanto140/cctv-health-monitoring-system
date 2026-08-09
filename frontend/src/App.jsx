@@ -1,10 +1,13 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
+import Home from "./pages/public/Home.jsx";
+
+
 function App() {
   return (
-    <>
-      Hello guys
-    </>
+    <Routes>
+       <Route path="/" element={<Home />} />
+    </Routes>
   );
 }
 
