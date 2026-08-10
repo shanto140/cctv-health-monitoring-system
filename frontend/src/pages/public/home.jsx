@@ -85,13 +85,13 @@ export default function Home() {
               </a>
             ))}
           </div>
-          <a
-            href="#login"
+         <Link
+            to="/login"
             className="text-sm px-4 py-2 rounded border transition-colors"
             style={{ borderColor: TOKENS.signal, color: TOKENS.signal }}
           >
             Login →
-          </a>
+          </Link>
         </nav>
       </header>
 
