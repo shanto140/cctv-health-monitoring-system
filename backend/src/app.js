@@ -5,6 +5,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
+import authRoutes from "./routes/authRoutes.js";
+
 
 const app = express();
 
@@ -22,9 +24,9 @@ app.get('/', (req, res) => {
   res.send('CCTV Health Monitoring API is running');
 });
 
-// ── Routes এখানে যোগ হবে (যখন যেই module বানাবা) ──
-// import cameraRoutes from './routes/cameraRoutes.js';
-// app.use('/cameras', cameraRoutes);
+
+app.use("/api/auth", authRoutes);
+
 
 
 
