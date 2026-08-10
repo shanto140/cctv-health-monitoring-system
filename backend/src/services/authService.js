@@ -1,0 +1,69 @@
+import bcrypt from "bcryptjs";
+import pool from "../config/db.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
+
+
+const findAccountByEmail = async(email) => {
+
+  const [admins] = await pool.query(
+    "SELECT id, name, email, password, is_active FROM admins WHERE email = ?",
+    [email]
+  );
+  if (admins.length > 0) {
+    return { ...admins[0], role: "Admin" };
+  }
+
+  const [technicians] = await pool.query(
+    "SELECT id, name, email, password, is_active FROM technicians WHERE email = ?",
+    [email]
+  );
+  if (technicians.length > 0) {
+    return { ...technicians[0], role: "Technician" };
+  }
+
+  return null;
+}
+
+const saveRefreshToken =async(id, role, refreshToken) => {
+  const table = role === "Admin" ? "admins" : "technicians";
+  await pool.query(`UPDATE ${table} SET refresh_token = ? WHERE id = ?`, [refreshToken, id]);
+}
+
+const login = async({ email, password }) => {
+  const account = await findAccountByEmail(email);
+
+  if (!account) {
+    throw { status: 401, message: "Invalid email or password." };
+  }
+
+  if (!account.is_active) {
+    throw { status: 403, message: "This account has been deactivated. Contact an admin." };
+  }
+
+  const passwordMatches = await bcrypt.compare(password, account.password);
+  if (!passwordMatches) {
+    throw { status: 401, message: "Invalid email or password." };
+  }
+   
+  const payload = { id: account.id, role: account.role };
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
+
+  await saveRefreshToken(account.id, account.role, refreshToken);
+
+  return {
+    accessToken,
+    refreshToken,
+    role: account.role,
+    user: {
+      id: account.id,
+      name: account.name,
+      email: account.email,
+    },
+  };
+}
+
+export { 
+  findAccountByEmail , 
+  login 
+};

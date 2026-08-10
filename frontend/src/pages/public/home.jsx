@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Camera,
   ScanEye,
@@ -84,13 +85,13 @@ export default function Home() {
               </a>
             ))}
           </div>
-          <a
-            href="#login"
+         <Link
+            to="/login"
             className="text-sm px-4 py-2 rounded border transition-colors"
             style={{ borderColor: TOKENS.signal, color: TOKENS.signal }}
           >
             Login →
-          </a>
+          </Link>
         </nav>
       </header>
 
@@ -106,13 +107,13 @@ export default function Home() {
             Real-time camera monitoring, automatic issue detection, and technician dispatch — all in one place.
           </p>
           <div className="flex items-center gap-4">
-            <a
-              href="#login"
+             <Link
+              to="/login"
               className="text-sm px-5 py-3 rounded flex items-center gap-2 font-medium transition-transform hover:-translate-y-0.5"
               style={{ backgroundColor: TOKENS.signal, color: TOKENS.void }}
             >
               Login to Dashboard <ArrowRight size={16} />
-            </a>
+            </Link>
             <span className="text-xs" style={{ color: TOKENS.fog }}>
               Admin &amp; Technician access
             </span>
