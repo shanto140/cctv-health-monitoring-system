@@ -1,1 +1,3 @@
 npm install lucide-react
+
+npm install bcryptjs  // backend e lagche

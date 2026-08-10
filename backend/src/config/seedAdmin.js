@@ -1,23 +1,49 @@
-require('dotenv').config();
-const bcrypt = require('bcrypt');
-const db = require('./db');
+import "dotenv/config";
+import bcrypt from "bcryptjs";
+import pool from "./db.js";
 
-const seed = async () => {
-  const name = 'Super Admin';
-  const email = 'admin@cctv.com';
-  const plainPassword = 'admin123'; 
-  const hashed = await bcrypt.hash(plainPassword, 10);
+async function createAdmin() {
+  const [name, email, password] = process.argv.slice(2);
+
+  if (!name || !email || !password) {
+    console.log(
+      "Usage: node src/config/seedAdmin.js <name> <email> <password>"
+    );
+    process.exit(1);
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    console.error("Invalid email address.");
+    process.exit(1);
+  }
+
+
+  if (password.length < 6) {
+    console.error("Password must be at least 6 characters long.");
+    process.exit(1);
+  }
 
   try {
-    await db.query(
-      `INSERT INTO admins (name, email, password, is_active) VALUES (?, ?, ?, TRUE)`,
-      [name, email, hashed]
-    );
-    console.log(`Admin created -> email: ${email}, password: ${plainPassword}`);
-  } catch (err) {
-    console.error('Seed failed (হয়তো আগে থেকেই আছে):', err.message);
-  }
-  process.exit();
-};
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-seed();
+    await pool.query(
+      `INSERT INTO admins (name, email, password, is_active)
+       VALUES (?, ?, ?, TRUE)`,
+      [name, email, hashedPassword],
+    );
+
+    console.log(`Admin account created for ${email}`);
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      console.error(`An account with email ${email} already exists.`);
+    } else {
+      console.error("Failed to create admin:", err.message);
+    }
+  } finally {
+    await pool.end();
+  }
+}
+
+createAdmin();
