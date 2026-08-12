@@ -9,7 +9,7 @@ import * as authService from "../services/authService.js";
   }
 
   try {
-    const { accessToken, refreshToken, role, user } = await authService.login({ email, password });
+    const { accessToken, refreshToken,  user } = await authService.login({ email, password });
 
    
     res.cookie("accessToken", accessToken, {
@@ -26,7 +26,7 @@ import * as authService from "../services/authService.js";
       maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
 
-    return res.status(200).json({ role, user });
+    return res.status(200).json(user);
   } catch (err) {
     const status = err.status || 500;
     const message = err.message || "Something went wrong. Please try again.";

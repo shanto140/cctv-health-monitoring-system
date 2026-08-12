@@ -36,10 +36,13 @@ export default function Login() {
     try {
       const data = await loginUser(formData);
 
-      const user = data?.user;
+      const user = data;
       if (!user) {
         throw new Error("User not found in response");
       }
+
+      console.log(user);
+      console.log(data);
 
       if (user.role === "Admin") {
         navigate("/admin/dashboard");
