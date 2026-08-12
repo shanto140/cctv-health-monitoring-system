@@ -90,15 +90,12 @@ CREATE TABLE technicians (
 -- Admin/Technician-কে জানানোর record রাখে, realtime socket ছাড়াও।
 -- ----------------------------------------------------------------------------
 CREATE TABLE notifications (
-    id               INT PRIMARY KEY AUTO_INCREMENT,
-    recipient_id     INT NOT NULL,
-    recipient_role   ENUM('Admin', 'Technician') NOT NULL,
-    type             ENUM('new_issue', 'incident_assigned', 'incident_rejected', 'incident_completed') NOT NULL,
-    reference_type   ENUM('camera_issue', 'incident') NOT NULL,
-    reference_id     INT NOT NULL,
-    is_read          BOOLEAN DEFAULT FALSE,
-    read_at          DATETIME,
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP
+    id              INT PRIMARY KEY AUTO_INCREMENT,
+    receiver_id     INT NOT NULL,
+    receiver_role   ENUM('Admin', 'Technician') NOT NULL,
+    message         VARCHAR(255) NOT NULL,
+    is_read         BOOLEAN DEFAULT FALSE,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 
