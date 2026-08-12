@@ -9,15 +9,17 @@ const findAccountByEmail = async(email) => {
     "SELECT id, name, email, password, is_active FROM admins WHERE email = ?",
     [email]
   );
-  if (admins.length > 0) {
+  if (admins.length > 0) {  
+    console.log("admin");
     return { ...admins[0], role: "Admin" };
   }
-
+   
   const [technicians] = await pool.query(
     "SELECT id, name, email, password, is_active FROM technicians WHERE email = ?",
     [email]
   );
   if (technicians.length > 0) {
+    console.log("admin");
     return { ...technicians[0], role: "Technician" };
   }
 
@@ -35,7 +37,7 @@ const login = async({ email, password }) => {
   if (!account) {
     throw { status: 401, message: "Invalid email or password." };
   }
-
+  
   if (!account.is_active) {
     throw { status: 403, message: "This account has been deactivated. Contact an admin." };
   }
@@ -54,8 +56,8 @@ const login = async({ email, password }) => {
   return {
     accessToken,
     refreshToken,
-    role: account.role,
     user: {
+      role: account.role,
       id: account.id,
       name: account.name,
       email: account.email,

@@ -7,7 +7,11 @@ import cookieParser from 'cookie-parser';
 import pool, { connectDB } from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
-
+import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
+import cameraIssueRoutes from "./routes/cameraIssueRoutes.js";
+import incidentRoutes from "./routes/incidentRoutes.js";
+import technicianRoutes from "./routes/technicianRoutes.js";
+import cameraRoutes from "./routes/cameraRoutes.js";
 
 const app = express();
 
@@ -28,6 +32,11 @@ app.get('/', (req, res) => {
 
 app.use("/api/auth", authRoutes);
 
+app.use("/api/admin/dashboard", adminDashboardRoutes);
+app.use("/api/camera-issues", cameraIssueRoutes);
+app.use("/api/incidents", incidentRoutes);
+app.use("/api/technicians", technicianRoutes);
+app.use("/api/cameras", cameraRoutes);
 
 
 
