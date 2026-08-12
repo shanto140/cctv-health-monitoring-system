@@ -125,4 +125,4 @@ CREATE TABLE incidents (
 CREATE INDEX idx_incident_status ON incidents(status);
 CREATE INDEX idx_incident_technician ON incidents(assigned_technician_id);
 CREATE INDEX idx_issue_camera_status ON camera_issues(camera_id, status);
-CREATE INDEX idx_notification_recipient ON notifications(recipient_id, recipient_role);
+CREATE INDEX idx_notification_receiver ON notifications(receiver_id, receiver_role, is_read);
