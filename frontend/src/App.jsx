@@ -8,6 +8,9 @@ import Cameras from "./pages/admin/Cameras.jsx";
 import CameraDetail from "./pages/admin/CameraDetail.jsx";
 import Technicians from "./pages/admin/Technicians.jsx";
 import TechnicianDetail from "./pages/admin/TechnicianDetail.jsx";
+import Incidents from "./pages/admin/Incidents.jsx";
+import IncidentDetail from "./pages/admin/IncidentDetail.jsx";
+
 
 
 function App() {
@@ -22,6 +25,8 @@ function App() {
         <Route path="cameras/:id" element={<CameraDetail />} /> 
         <Route path="technicians" element={<Technicians />} />
         <Route path="technicians/:id" element={<TechnicianDetail />} />
+        <Route path="incidents" element={<Incidents />} />
+        <Route path="incidents/:id" element={<IncidentDetail />} />
       </Route>
     </Routes>
   );

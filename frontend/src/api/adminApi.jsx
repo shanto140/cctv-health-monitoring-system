@@ -77,3 +77,20 @@ export const toggleTechnicianStatus = async (id, isActive) => {
   const res = await api.patch(`/technicians/${id}/status`, { is_active: isActive });
   return res.data;
 };
+
+
+// ---------- Incidents ----------
+export const getIncidents = async ({ page = 1, limit = 10, status = "", priority = "", cameraName = "" } = {}) => {
+  const res = await api.get("/incidents", { params: { page, limit, status, priority, cameraName } });
+  return res.data;
+};
+
+export const getIncidentDetail = async (id) => {
+  const res = await api.get(`/incidents/${id}`);
+  return res.data;
+};
+
+export const assignTechnicianToIncident = async (id, technicianId) => {
+  const res = await api.patch(`/incidents/${id}/assign`, { technician_id: technicianId });
+  return res.data;
+};
