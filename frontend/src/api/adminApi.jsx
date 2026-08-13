@@ -17,13 +17,6 @@ export const createIncident = async (payload) => {
   return res.data;
 };
 
-
-export const getTechnicianOptions = async () => {
-  const res = await api.get("/technicians");
-  return res.data;
-};
-
-
 export const getCameras = async ({ page = 1, limit = 10, search = "", status = "" } = {}) => {
   const res = await api.get("/cameras", { params: { page, limit, search, status } });
   return res.data;
@@ -51,5 +44,36 @@ export const updateCamera = async (id, payload) => {
 
 export const deleteCamera = async (id) => {
   const res = await api.delete(`/cameras/${id}`);
+  return res.data;
+};
+
+// ---------- Technicians ----------
+export const getTechnicians = async ({ page = 1, limit = 10, search = "" } = {}) => {
+  const res = await api.get("/technicians", { params: { page, limit, search } });
+  return res.data;
+};
+
+export const getTechnicianDetail = async (id) => {
+  const res = await api.get(`/technicians/${id}`);
+  return res.data;
+};
+
+export const getTechnicianWorkHistory = async (id, page = 1, limit = 10) => {
+  const res = await api.get(`/technicians/${id}/incidents`, { params: { page, limit } });
+  return res.data;
+};
+
+export const getTechnicianOptions = async () => {
+  const res = await api.get("/technicians/options/assignable");
+  return res.data;
+};
+
+export const registerTechnician = async (payload) => {
+  const res = await api.post("/technicians", payload);
+  return res.data;
+};
+
+export const toggleTechnicianStatus = async (id, isActive) => {
+  const res = await api.patch(`/technicians/${id}/status`, { is_active: isActive });
   return res.data;
 };
