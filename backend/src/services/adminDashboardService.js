@@ -1,7 +1,7 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 
 export const fetchDashboardStats = async () => {
-  const [rows] = await db.query(`
+  const [rows] = await pool.query(`
     SELECT
       (SELECT COUNT(*) FROM cameras WHERE is_active = TRUE) AS totalCameras,
       (SELECT COUNT(*) FROM cameras WHERE is_active = TRUE AND current_status = 'Online') AS onlineCameras,
