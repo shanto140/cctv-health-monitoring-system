@@ -3,7 +3,7 @@ import pool from "../config/db.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 
 
-const findAccountByEmail = async(email) => {
+export const findAccountByEmail = async(email) => {
 
   const [admins] = await pool.query(
     "SELECT id, name, email, password, is_active FROM admins WHERE email = ?",
@@ -31,7 +31,7 @@ const saveRefreshToken =async(id, role, refreshToken) => {
   await pool.query(`UPDATE ${table} SET refresh_token = ? WHERE id = ?`, [refreshToken, id]);
 }
 
-const login = async({ email, password }) => {
+export const login = async({ email, password }) => {
   const account = await findAccountByEmail(email);
 
   if (!account) {
@@ -65,7 +65,12 @@ const login = async({ email, password }) => {
   };
 }
 
-export { 
-  findAccountByEmail , 
-  login 
+export const findRefreshToken = async (id, role) => {
+  const table = role === "Admin" ? "admins" : "technicians";
+  const [[row]] = await db.query(
+    `SELECT refresh_token FROM ${table} WHERE id = ?`,
+    [id]
+  );
+  return row?.refresh_token || null;
 };
+
