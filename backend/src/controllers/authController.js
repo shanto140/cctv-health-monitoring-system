@@ -1,6 +1,7 @@
-import * as authService from "../services/authService.js";
+import { verifyRefreshToken, generateAccessToken } from "../utils/token.js";
+import { findRefreshToken , login as loginService} from "../services/authService.js";
 
- const login = async(req, res) =>{
+ export const login = async(req, res) =>{ 
 
   const { email, password } = req.body;
 
@@ -9,7 +10,7 @@ import * as authService from "../services/authService.js";
   }
 
   try {
-    const { accessToken, refreshToken,  user } = await authService.login({ email, password });
+    const { accessToken, refreshToken,  user } = await loginService({ email, password });
 
    
     res.cookie("accessToken", accessToken, {
@@ -34,6 +35,33 @@ import * as authService from "../services/authService.js";
   }
 }
 
-export{
-  login
+
+export const refreshAccessToken = async (req, res) => {
+
+  const refreshToken = req.cookies?.refreshToken;
+  if (!refreshToken) {
+    return res.status(401).json({ message: "No refresh token provided" });
+  }
+
+  try {
+    const decoded = verifyRefreshToken(refreshToken);
+
+    const storedToken = await findRefreshToken(decoded.id, decoded.role);
+    if (!storedToken || storedToken !== refreshToken) {
+      return res.status(401).json({ message: "Invalid or revoked refresh token" });
+    }
+
+    const newAccessToken = generateAccessToken({ id: decoded.id, role: decoded.role });
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.json({ message: "Access token refreshed" });
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired refresh token" });
+  }
 };

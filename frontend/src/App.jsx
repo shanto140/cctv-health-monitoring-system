@@ -6,6 +6,9 @@ import Layout from "./components/admin/Layout.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import Cameras from "./pages/admin/Cameras.jsx"; 
 import CameraDetail from "./pages/admin/CameraDetail.jsx";
+import Technicians from "./pages/admin/Technicians.jsx";
+import TechnicianDetail from "./pages/admin/TechnicianDetail.jsx";
+
 
 function App() {
   return (
@@ -16,7 +19,9 @@ function App() {
       <Route path="/admin" element={<Layout />}>
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="cameras" element={<Cameras />} />
-        <Route path="cameras/:id" element={<CameraDetail />} />
+        <Route path="cameras/:id" element={<CameraDetail />} /> 
+        <Route path="technicians" element={<Technicians />} />
+        <Route path="technicians/:id" element={<TechnicianDetail />} />
       </Route>
     </Routes>
   );
