@@ -1,11 +1,11 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 
 export const createIncidentWithIssueLink = async ({ camera_id, camera_issue_id, issue_type, priority, description, technician_id }) => {
   if (!camera_issue_id) {
     throw new Error("CAMERA_ISSUE_ID_REQUIRED");
   }
 
-  const conn = await db.getConnection();
+  const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
@@ -42,4 +42,101 @@ export const createIncidentWithIssueLink = async ({ camera_id, camera_issue_id, 
   } finally {
     conn.release();
   }
+};
+
+export const getIncidentsList = async ({ page = 1, limit = 10, status = "", priority = "", cameraName = "" }) => {
+  const offset = (page - 1) * limit;
+  const conditions = [];
+  const params = [];
+
+  if (status) {
+    conditions.push("i.status = ?");
+    params.push(status);
+  }
+  if (priority) {
+    conditions.push("i.priority = ?");
+    params.push(priority);
+  }
+  if (cameraName) {
+    conditions.push("c.name LIKE ?");
+    params.push(`%${cameraName}%`);
+  }
+
+  const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const [countRows] = await pool.query(
+    `SELECT COUNT(*) AS total 
+     FROM incidents i 
+     JOIN cameras c ON i.camera_id = c.id 
+     ${whereClause}`,
+    params
+  );
+  const total = countRows[0].total;
+
+  const [rows] = await pool.query(
+    `SELECT i.id, i.status, i.priority, i.created_at, 
+            c.name AS camera_name, ci.issue_type
+     FROM incidents i
+     JOIN cameras c ON i.camera_id = c.id
+     LEFT JOIN camera_issues ci ON i.camera_issue_id = ci.id
+     ${whereClause}
+     ORDER BY i.created_at DESC
+     LIMIT ? OFFSET ?`,
+    [...params, Number(limit), Number(offset)]
+  );
+
+  return {
+    data: rows,
+    page: Number(page),
+    totalPages: Math.ceil(total / limit) || 1,
+  };
+};
+
+// ---------- Get Single Incident Detail ----------
+export const getIncidentDetail = async (id) => {
+  const [rows] = await pool.query(
+    `SELECT 
+        i.id, i.status, i.priority, i.description, i.remarks,
+        i.created_at, i.assigned_at, i.completed_at,
+        c.id AS camera_id, c.name AS camera_name, c.location AS camera_location, c.ip_address AS camera_ip,
+        ci.issue_type,
+        t.id AS technician_id, t.name AS technician_name, t.phone AS technician_phone, t.email AS technician_email
+     FROM incidents i
+     JOIN cameras c ON i.camera_id = c.id
+     LEFT JOIN camera_issues ci ON i.camera_issue_id = ci.id
+     LEFT JOIN technicians t ON i.assigned_technician_id = t.id
+     WHERE i.id = ?`,
+    [id]
+  );
+
+  if (rows.length === 0) {
+    throw new Error("INCIDENT_NOT_FOUND");
+  }
+  return rows[0];
+};
+// ---------- Assign / Reassign Technician ----------
+export const assignTechnicianToIncident = async (incidentId, technicianId) => {
+  const [existing] = await pool.query(
+    `SELECT status FROM incidents WHERE id = ?`,
+    [incidentId]
+  );
+
+  if (existing.length === 0) {
+    throw new Error("INCIDENT_NOT_FOUND");
+  }
+
+  const currentStatus = existing[0].status;
+  if (currentStatus !== "Open" && currentStatus !== "Rejected") {
+    throw new Error("INVALID_STATUS_FOR_ASSIGN");
+  }
+
+  await pool.query(
+    `UPDATE incidents 
+     SET assigned_technician_id = ?, status = 'Assigned', remarks = NULL, assigned_at = NOW()
+     WHERE id = ?`,
+    [technicianId, incidentId]
+  );
+
+  const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
+  return updated[0];
 };

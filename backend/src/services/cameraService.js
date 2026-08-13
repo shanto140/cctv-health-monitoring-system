@@ -1,4 +1,4 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 
 export const fetchCameras = async ({ page = 1, limit = 10, search = "", status = "" }) => {
   const offset = (page - 1) * limit;
@@ -17,7 +17,7 @@ export const fetchCameras = async ({ page = 1, limit = 10, search = "", status =
 
   const whereClause = conditions.join(" AND ");
 
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     `SELECT id, name, location, current_status, status_updated_at
      FROM cameras
      WHERE ${whereClause}
@@ -26,7 +26,7 @@ export const fetchCameras = async ({ page = 1, limit = 10, search = "", status =
     [...params, limit, offset]
   );
 
-  const [[{ total }]] = await db.query(
+  const [[{ total }]] = await pool.query(
     `SELECT COUNT(*) AS total FROM cameras WHERE ${whereClause}`,
     params
   );
@@ -35,7 +35,7 @@ export const fetchCameras = async ({ page = 1, limit = 10, search = "", status =
 };
 
 export const fetchCameraById = async (id) => {
-  const [[camera]] = await db.query(
+  const [[camera]] = await pool.query(
     `SELECT id, name, location, ip_address, stream_url, current_status, status_updated_at, created_at
      FROM cameras WHERE id = ? AND is_active = TRUE`,
     [id]
@@ -46,7 +46,7 @@ export const fetchCameraById = async (id) => {
 export const fetchCameraIssueHistory = async (cameraId, page = 1, limit = 10) => {
   const offset = (page - 1) * limit;
 
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     `SELECT id, issue_type, status, detected_at, resolved_at
      FROM camera_issues
      WHERE camera_id = ?
@@ -55,7 +55,7 @@ export const fetchCameraIssueHistory = async (cameraId, page = 1, limit = 10) =>
     [cameraId, limit, offset]
   );
 
-  const [[{ total }]] = await db.query(
+  const [[{ total }]] = await pool.query(
     `SELECT COUNT(*) AS total FROM camera_issues WHERE camera_id = ?`,
     [cameraId]
   );
@@ -65,7 +65,7 @@ export const fetchCameraIssueHistory = async (cameraId, page = 1, limit = 10) =>
 
 
 export const insertCamera = async ({ name, location, ip_address, stream_url }) => {
-  const [result] = await db.query(
+  const [result] = await pool.query(
     `INSERT INTO cameras (name, location, ip_address, stream_url, current_status)
      VALUES (?, ?, ?, ?, 'Offline')`,
     [name, location, ip_address || null, stream_url]
@@ -74,7 +74,7 @@ export const insertCamera = async ({ name, location, ip_address, stream_url }) =
 };
 
 export const updateCameraById = async (id, { name, location, ip_address, stream_url }) => {
-  const [result] = await db.query(
+  const [result] = await pool.query(
     `UPDATE cameras SET name = ?, location = ?, ip_address = ?, stream_url = ?
      WHERE id = ? AND is_active = TRUE`,
     [name, location, ip_address || null, stream_url, id]
@@ -84,7 +84,7 @@ export const updateCameraById = async (id, { name, location, ip_address, stream_
 };
 
 export const softDeleteCamera = async (id) => {
-  const [result] = await db.query(
+  const [result] = await pool.query(
     `UPDATE cameras SET is_active = FALSE WHERE id = ?`,
     [id]
   );
