@@ -1,6 +1,7 @@
 import { verifyRefreshToken, generateAccessToken } from "../utils/token.js";
 import { findRefreshToken , login as loginService} from "../services/authService.js";
 
+
  export const login = async(req, res) =>{ 
 
   const { email, password } = req.body;
@@ -34,6 +35,13 @@ import { findRefreshToken , login as loginService} from "../services/authService
     return res.status(status).json({ message });
   }
 }
+
+export const logout = async (req, res) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  // also worth: delete the stored refreshToken row in DB, since refresh checks against DB
+  res.status(200).json({ message: "Logged out" });
+};
 
 
 export const refreshAccessToken = async (req, res) => {

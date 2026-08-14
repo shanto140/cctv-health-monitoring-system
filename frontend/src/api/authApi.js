@@ -4,3 +4,8 @@ export async function loginUser(credentials) {
   const res = await api.post("/auth/login", credentials);
   return res.data;
 }
+
+export async function logoutUser() {
+  const res = await api.post("/auth/logout");
+  return res.data;
+}

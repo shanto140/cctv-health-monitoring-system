@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Camera, AlertTriangle, Wrench, LogOut } from "lucide-react";
+import { logoutUser } from "../../api/authApi";
 
 const navItems = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -11,9 +12,14 @@ const navItems = [
 export default function Sidebar() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // TODO: auth context clear + logout API call
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      navigate("/login");
+    }
   };
 
   return (
