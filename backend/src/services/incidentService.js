@@ -140,3 +140,130 @@ export const assignTechnicianToIncident = async (incidentId, technicianId) => {
   const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
   return updated[0];
 };
+
+// ---------- Technician: Accept Incident ----------
+export const acceptIncidentById = async (incidentId, technicianId) => {
+  const [existing] = await pool.query(
+    `SELECT status, assigned_technician_id FROM incidents WHERE id = ?`,
+    [incidentId]
+  );
+  if (existing.length === 0) throw new Error("INCIDENT_NOT_FOUND");
+ 
+  const incident = existing[0];
+  if (incident.assigned_technician_id !== technicianId) {
+    throw new Error("NOT_ASSIGNED_TO_YOU");
+  }
+  if (incident.status !== "Assigned") {
+    throw new Error("INVALID_STATUS_FOR_ACCEPT");
+  }
+ 
+  await pool.query(`UPDATE incidents SET status = 'In Progress' WHERE id = ?`, [incidentId]);
+ 
+  const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
+  return updated[0];
+};
+ 
+// ---------- Technician: Reject Incident (reason required) ----------
+export const rejectIncidentById = async (incidentId, technicianId, reason) => {
+  if (!reason || !reason.trim()) {
+    throw new Error("REASON_REQUIRED");
+  }
+ 
+  const [existing] = await pool.query(
+    `SELECT status, assigned_technician_id FROM incidents WHERE id = ?`,
+    [incidentId]
+  );
+  if (existing.length === 0) throw new Error("INCIDENT_NOT_FOUND");
+ 
+  const incident = existing[0];
+  if (incident.assigned_technician_id !== technicianId) {
+    throw new Error("NOT_ASSIGNED_TO_YOU");
+  }
+  if (!["Assigned", "In Progress"].includes(incident.status)) {
+    throw new Error("INVALID_STATUS_FOR_REJECT");
+  }
+ 
+  // reject করলে incident আবার unassigned হয়ে যায়, admin আবার assign করতে পারবে
+  await pool.query(
+    `UPDATE incidents
+     SET status = 'Rejected', remarks = ?, assigned_technician_id = NULL, assigned_at = NULL
+     WHERE id = ?`,
+    [reason.trim(), incidentId]
+  );
+ 
+  const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
+  return updated[0];
+};
+ 
+// ---------- Technician: Complete Incident (comment optional) ----------
+export const completeIncidentById = async (incidentId, technicianId, comment) => {
+  const [existing] = await pool.query(
+    `SELECT status, assigned_technician_id FROM incidents WHERE id = ?`,
+    [incidentId]
+  );
+  if (existing.length === 0) throw new Error("INCIDENT_NOT_FOUND");
+ 
+  const incident = existing[0];
+  if (incident.assigned_technician_id !== technicianId) {
+    throw new Error("NOT_ASSIGNED_TO_YOU");
+  }
+  if (incident.status !== "In Progress") {
+    throw new Error("INVALID_STATUS_FOR_COMPLETE");
+  }
+ 
+  await pool.query(
+    `UPDATE incidents
+     SET status = 'Completed', remarks = ?, completed_at = NOW()
+     WHERE id = ?`,
+    [comment ? comment.trim() : null, incidentId]
+  );
+ 
+  const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
+  return updated[0];
+};
+
+
+// ---------- Technician: My Incidents (assigned to me) ----------
+export const getTechnicianIncidentsList = async ({ technicianId, page = 1, limit = 10, status = "" }) => {
+  const offset = (page - 1) * limit;
+  const conditions = ["i.assigned_technician_id = ?"];
+  const params = [technicianId];
+ 
+  if (status) {
+    conditions.push("i.status = ?");
+    params.push(status);
+  }
+ 
+  const whereClause = `WHERE ${conditions.join(" AND ")}`;
+ 
+  const [countRows] = await pool.query(
+    `SELECT COUNT(*) AS total FROM incidents i ${whereClause}`,
+    params
+  );
+  const total = countRows[0].total;
+ 
+  const [rows] = await pool.query(
+    `SELECT i.id, i.status, i.priority, i.description, i.remarks,
+            i.created_at, i.assigned_at, i.completed_at,
+            c.name AS camera_name, c.location AS camera_location,
+            ci.issue_type
+     FROM incidents i
+     JOIN cameras c ON i.camera_id = c.id
+     LEFT JOIN camera_issues ci ON i.camera_issue_id = ci.id
+     ${whereClause}
+     ORDER BY
+       CASE i.status WHEN 'Assigned' THEN 0 WHEN 'In Progress' THEN 1 ELSE 2 END,
+       i.assigned_at DESC
+     LIMIT ? OFFSET ?`,
+    [...params, Number(limit), Number(offset)]
+  );
+ 
+  return {
+    data: rows,
+    page: Number(page),
+    totalPages: Math.ceil(total / limit) || 1,
+  };
+};
+
+
+

@@ -4,6 +4,13 @@ import { getDashboardStats, getActiveCameraIssues } from "../../api/adminApi";
 import Pagination from "../../components/admin/Pagination";
 import CreateIncidentModal from "../../components/admin/CreateIncidentModal";
 
+import {
+  getMyIncidents,
+  acceptIncident,
+  rejectIncident,
+  completeIncident,
+} from "../../api/technicianPortal.api";
+
 function StatCard({ label, value, icon: Icon, accent, live }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-center justify-between">
