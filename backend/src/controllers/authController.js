@@ -1,5 +1,5 @@
 import { verifyRefreshToken, generateAccessToken } from "../utils/token.js";
-import { findRefreshToken , login as loginService} from "../services/authService.js";
+import { findRefreshToken , login as loginService,findAccountById} from "../services/authService.js";
 
 
  export const login = async(req, res) =>{ 
@@ -43,6 +43,24 @@ export const logout = async (req, res) => {
   res.status(200).json({ message: "Logged out" });
 };
 
+export const me = async (req, res) => {
+  // authMiddleware already verified the accessToken and set req.user = { id, role }
+  try {
+    const account = await findAccountById(req.user.id, req.user.role);
+    if (!account || !account.is_active) {
+      return res.status(401).json({ message: "Account not found or deactivated." });
+    }
+    return res.status(200).json({
+      role: account.role,
+      id: account.id,
+      name: account.name,
+      email: account.email,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: "Something went wrong." });
+  }
+};
+
 
 export const refreshAccessToken = async (req, res) => {
 
@@ -65,7 +83,7 @@ export const refreshAccessToken = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
+      maxAge: 150 * 60 * 1000,
     });
 
     res.json({ message: "Access token refreshed" });

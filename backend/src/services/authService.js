@@ -26,6 +26,17 @@ export const findAccountByEmail = async(email) => {
   return null;
 }
 
+
+export const findAccountById = async (id, role) => {
+  const table = role === "Admin" ? "admins" : "technicians";
+  const [rows] = await pool.query(
+    `SELECT id, name, email, is_active FROM ${table} WHERE id = ?`,
+    [id]
+  );
+  if (rows.length === 0) return null;
+  return { ...rows[0], role };
+};
+
 const saveRefreshToken =async(id, role, refreshToken) => {
   const table = role === "Admin" ? "admins" : "technicians";
   await pool.query(`UPDATE ${table} SET refresh_token = ? WHERE id = ?`, [refreshToken, id]);
@@ -67,7 +78,7 @@ export const login = async({ email, password }) => {
 
 export const findRefreshToken = async (id, role) => {
   const table = role === "Admin" ? "admins" : "technicians";
-  const [[row]] = await db.query(
+  const [[row]] = await pool.query(
     `SELECT refresh_token FROM ${table} WHERE id = ?`,
     [id]
   );

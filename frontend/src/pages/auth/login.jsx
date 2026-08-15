@@ -1,10 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScanEye, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { loginUser } from "../../api/authApi";
+import { useAuth } from "../../context/AuthContext";
+
 
 export default function Login() {
   const navigate = useNavigate();
+  
+  const { user, loading: authLoading, setUser } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (user.role === "Admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/technician/dashboard", { replace: true });
+      }
+    }
+  }, [authLoading, user, navigate]);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -40,6 +54,7 @@ export default function Login() {
       if (!user) {
         throw new Error("User not found in response");
       }
+      setUser(user);
 
       console.log(user);
       console.log(data);
