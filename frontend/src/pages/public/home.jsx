@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 import {
   Camera,
   ScanEye,
@@ -41,6 +44,18 @@ function makeInitialCameras() {
 
 export default function Home() {
   const [cameras, setCameras] = useState(makeInitialCameras);
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (user.role === "Admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/technician/dashboard", { replace: true });
+      }
+    }
+  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {

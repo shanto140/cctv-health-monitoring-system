@@ -14,7 +14,7 @@ const processQueue = (error) => {
 };
 
 const isAuthRoute = (url = "") =>
-  url.includes("/auth/login") || url.includes("/auth/refresh") || url.includes("/auth/register");
+  url.includes("/auth/login") || url.includes("/auth/refresh") || url.includes("/auth/register") || url.includes("/auth/me");
 
 api.interceptors.response.use(
   (response) => response,
@@ -39,7 +39,9 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError);
-      window.location.href = "/login";
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

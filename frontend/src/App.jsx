@@ -1,5 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
+import { AuthProvider } from "./context/AuthContext.jsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.jsx"; 
+
 import Home from "./pages/public/Home.jsx";
 import Login from "./pages/auth/login.jsx";
 import Layout from "./components/admin/Layout.jsx";
@@ -15,11 +18,20 @@ import IncidentDetail from "./pages/admin/IncidentDetail.jsx";
 
 function App() {
   return (
+   <AuthProvider>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
 
-      <Route path="/admin" element={<Layout />}>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="cameras" element={<Cameras />} />
         <Route path="cameras/:id" element={<CameraDetail />} /> 
@@ -29,6 +41,7 @@ function App() {
         <Route path="incidents/:id" element={<IncidentDetail />} />
       </Route>
     </Routes>
+  </AuthProvider>
   );
 }
 
