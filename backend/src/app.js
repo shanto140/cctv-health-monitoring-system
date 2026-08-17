@@ -38,7 +38,14 @@ app.use("/api/incidents", incidentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/cameras", cameraRoutes);
 
-
+// multer (file upload) errors — e.g. size limit exceeded, wrong file type
+app.use((err, req, res, next) => {
+  if (err?.name === "MulterError" || err?.message === "Only image files are allowed") {
+    return res.status(400).json({ message: err.message });
+  }
+  next(err);
+});
+ 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
