@@ -53,6 +53,7 @@ CREATE TABLE admins (
     name                   VARCHAR(100) NOT NULL,
     email                  VARCHAR(150) UNIQUE NOT NULL,
     phone                  VARCHAR(20),
+    address VARCHAR(255) AFTER phone;
     password               VARCHAR(255) NOT NULL,
     profile_image          VARCHAR(255),
     reset_token            VARCHAR(255) DEFAULT NULL,
@@ -60,6 +61,7 @@ CREATE TABLE admins (
     refresh_token          VARCHAR(500) DEFAULT NULL,
     is_active              BOOLEAN DEFAULT TRUE,
     created_at             DATETIME DEFAULT CURRENT_TIMESTAMP
+
 ) ENGINE=InnoDB;
 
 
@@ -74,6 +76,7 @@ CREATE TABLE technicians (
     name                   VARCHAR(100) NOT NULL,
     email                  VARCHAR(150) UNIQUE NOT NULL,
     phone                  VARCHAR(20),
+    address VARCHAR(255) AFTER phone;
     password               VARCHAR(255) NOT NULL,
     profile_image          VARCHAR(255),
     reset_token            VARCHAR(255) DEFAULT NULL,
