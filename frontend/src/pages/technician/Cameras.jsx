@@ -43,7 +43,7 @@ export default function Cameras() {
     <div className="space-y-5">
       <div>
         <h2 className="text-lg font-semibold text-slate-800">Cameras</h2>
-        <p className="text-sm text-slate-500">সিস্টেমে রেজিস্টার করা সব ক্যামেরা — status ও live preview দেখুন</p>
+        {/* <p className="text-sm text-slate-500">সিস্টেমে রেজিস্টার করা সব ক্যামেরা — status ও live preview দেখুন</p> */}
       </div>
 
       <div className="flex gap-3">
@@ -76,7 +76,7 @@ export default function Cameras() {
         </div>
       ) : cameras.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-10 text-center text-sm text-slate-400">
-          কোনো ক্যামেরা পাওয়া যায়নি
+          Not Found!
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
