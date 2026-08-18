@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Camera, MapPin, CheckCircle2, XCircle, PlayCircle, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Camera, MapPin, CheckCircle2, XCircle, PlayCircle, Clock, Video } from "lucide-react";
 import {
   getMyIncidents,
   acceptIncident,
@@ -31,6 +32,7 @@ const PRIORITY_STYLES = {
 };
 
 export default function TechnicianDashboard() {
+  const navigate = useNavigate();
   const [incidents, setIncidents] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -88,7 +90,7 @@ export default function TechnicianDashboard() {
     <div className="space-y-5">
       <div>
         <h2 className="text-lg font-semibold text-slate-800">My Incidents</h2>
-        <p className="text-sm text-slate-500">তোমাকে assign করা incident-গুলো এখানে ম্যানেজ করো</p>
+        {/* <p className="text-sm text-slate-500">তোমাকে assign করা incident-গুলো এখানে ম্যানেজ করো</p> */}
       </div>
 
       {/* Status filter tabs */}
@@ -186,6 +188,15 @@ export default function TechnicianDashboard() {
 
                 {/* Action buttons */}
                 <div className="flex gap-2 shrink-0">
+                  {incident.camera_id && (
+                    <button
+                      onClick={() => navigate(`/technician/cameras/${incident.camera_id}`)}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50"
+                    >
+                      <Video size={16} />
+                      View Camera
+                    </button>
+                  )}
                   {incident.status === "Assigned" && (
                     <>
                       <button

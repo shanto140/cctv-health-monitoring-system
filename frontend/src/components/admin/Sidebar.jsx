@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Camera, AlertTriangle, Wrench, LogOut } from "lucide-react";
+import { LayoutDashboard, Camera, AlertTriangle, Wrench, LogOut, History } from "lucide-react";
 import { logoutUser } from "../../api/authApi";
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { to: "/admin/cameras", label: "Cameras", icon: Camera },
   { to: "/admin/incidents", label: "Incidents", icon: AlertTriangle },
   { to: "/admin/technicians", label: "Technician", icon: Wrench },
+  { to: "/admin/event-history", label: "Event History", icon: History },
 ];
 
 export default function Sidebar() {
