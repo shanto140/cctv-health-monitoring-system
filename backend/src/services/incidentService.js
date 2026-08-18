@@ -1,4 +1,13 @@
 import pool from "../config/db.js";
+import { createNotification } from "./notificationService.js";
+
+// সব Admin-কে notify করার হেল্পার (multiple admin থাকতে পারে)
+const notifyAllAdmins = async (message) => {
+  const [admins] = await pool.query(`SELECT id FROM admins`);
+  await Promise.all(
+    admins.map((a) => createNotification({ receiver_id: a.id, receiver_role: "Admin", message }))
+  );
+};
 
 export const createIncidentWithIssueLink = async ({ camera_id, camera_issue_id, issue_type, priority, description, technician_id }) => {
   if (!camera_issue_id) {
@@ -136,10 +145,23 @@ export const assignTechnicianToIncident = async (incidentId, technicianId) => {
      WHERE id = ?`,
     [technicianId, incidentId]
   );
-
+  
   const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
+ 
+// টেকনিশিয়ানকে notify করা (US-07: system notifies the Technician)
+  const [cameraRows] = await pool.query(
+    `SELECT c.name AS camera_name FROM incidents i JOIN cameras c ON i.camera_id = c.id WHERE i.id = ?`,
+    [incidentId]
+  );
+  const cameraName = cameraRows[0]?.camera_name || "a camera";
+  await createNotification({
+    receiver_id: technicianId,
+    receiver_role: "Technician",
+    message: `You have been assigned a new incident on ${cameraName}.`,
+  });
   return updated[0];
 };
+
 
 // ---------- Technician: Accept Incident ----------
 export const acceptIncidentById = async (incidentId, technicianId) => {
@@ -192,6 +214,14 @@ export const rejectIncidentById = async (incidentId, technicianId, reason) => {
   );
  
   const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
+  
+    const [cameraRows] = await pool.query(
+    `SELECT c.name AS camera_name FROM incidents i JOIN cameras c ON i.camera_id = c.id WHERE i.id = ?`,
+    [incidentId]
+  );
+  const cameraName = cameraRows[0]?.camera_name || "a camera";
+  await notifyAllAdmins(`Incident on ${cameraName} was rejected by the technician: ${reason.trim()}`);
+
   return updated[0];
 };
  
@@ -219,6 +249,14 @@ export const completeIncidentById = async (incidentId, technicianId, comment) =>
   );
  
   const [updated] = await pool.query(`SELECT * FROM incidents WHERE id = ?`, [incidentId]);
+  
+  const [cameraRows] = await pool.query(
+    `SELECT c.name AS camera_name FROM incidents i JOIN cameras c ON i.camera_id = c.id WHERE i.id = ?`,
+    [incidentId]
+  );
+  const cameraName = cameraRows[0]?.camera_name || "a camera";
+  await notifyAllAdmins(`Incident on ${cameraName} has been marked Completed by the technician.`);
+ 
   return updated[0];
 };
 

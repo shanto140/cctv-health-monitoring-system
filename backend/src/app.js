@@ -12,6 +12,7 @@ import cameraIssueRoutes from "./routes/cameraIssueRoutes.js";
 import incidentRoutes from "./routes/incidentRoutes.js";
 import technicianRoutes from "./routes/technicianRoutes.js";
 import cameraRoutes from "./routes/cameraRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/api/camera-issues", cameraIssueRoutes);
 app.use("/api/incidents", incidentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/cameras", cameraRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // multer (file upload) errors — e.g. size limit exceeded, wrong file type
 app.use((err, req, res, next) => {
