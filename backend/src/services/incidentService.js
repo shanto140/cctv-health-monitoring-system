@@ -245,7 +245,7 @@ export const getTechnicianIncidentsList = async ({ technicianId, page = 1, limit
   const [rows] = await pool.query(
     `SELECT i.id, i.status, i.priority, i.description, i.remarks,
             i.created_at, i.assigned_at, i.completed_at,
-            c.name AS camera_name, c.location AS camera_location,
+            c.id AS camera_id, c.name AS camera_name, c.location AS camera_location,
             ci.issue_type
      FROM incidents i
      JOIN cameras c ON i.camera_id = c.id
@@ -264,6 +264,3 @@ export const getTechnicianIncidentsList = async ({ technicianId, page = 1, limit
     totalPages: Math.ceil(total / limit) || 1,
   };
 };
-
-
-
