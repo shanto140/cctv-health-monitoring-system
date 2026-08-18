@@ -1,10 +1,11 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { ListChecks, LogOut } from "lucide-react";
+import { ListChecks, Camera, LogOut } from "lucide-react";
 import { logoutUser } from "../../api/authApi";
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
   { to: "/technician/dashboard", label: "My Incidents", icon: ListChecks },
+  { to: "/technician/cameras", label: "Cameras", icon: Camera },
 ];
 
 export default function TechnicianSidebar() {

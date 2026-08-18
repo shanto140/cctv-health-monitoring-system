@@ -18,6 +18,7 @@ import EventHistory from "./pages/admin/EventHistory.jsx";
 import TechnicianLayout from "./components/technician/Layout.jsx";
 import TechnicianDashboard from "./pages/technician/Dashboard.jsx";
 import TechnicianCameraPreview from "./pages/technician/CameraPreview.jsx";
+import TechnicianCameras from "./pages/technician/Cameras.jsx";
 
 
 
@@ -55,6 +56,7 @@ function App() {
           }
         >
           <Route path="dashboard" element={<TechnicianDashboard />} />
+          <Route path="cameras" element={<TechnicianCameras />} />
           <Route path="cameras/:id" element={<TechnicianCameraPreview />} />
         </Route>
       </Routes>
