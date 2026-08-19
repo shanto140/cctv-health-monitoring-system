@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Plus, Circle } from "lucide-react";
 import { getTechnicians, toggleTechnicianStatus } from "../../api/adminApi";
-import Pagination from "../../components/admin/Pagination";
+import Pagination from "../../components/common/Pagination";
 import RegisterTechnicianModal from "../../components/admin/RegisterTechnicianModal";
 
 export default function Technicians() {

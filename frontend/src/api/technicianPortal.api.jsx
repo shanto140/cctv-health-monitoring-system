@@ -25,3 +25,9 @@ export const completeIncident = async (id, comment) => {
   const res = await api.patch(`/incidents/${id}/complete`, { comment });
   return res.data;
 };
+
+
+export const getTechnicianDashboardStats = async () => {
+  const res = await api.get("/technician/dashboard/stats");
+  return res.data;
+};

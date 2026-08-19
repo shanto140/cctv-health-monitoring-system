@@ -1,13 +1,15 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { ListChecks, LogOut } from "lucide-react";
+import { LayoutDashboard, Camera, ListChecks, LogOut } from "lucide-react";
 import { logoutUser } from "../../api/authApi";
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
-  { to: "/technician/dashboard", label: "My Incidents", icon: ListChecks },
+  { to: "/technician/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/technician/cameras", label: "Cameras", icon: Camera },
+  { to: "/technician/incidents", label: "My Incidents", icon: ListChecks },
 ];
 
-export default function TechnicianSidebar() {
+export default function Sidebar() {
   const navigate = useNavigate();
   const { clearUser } = useAuth();
 
