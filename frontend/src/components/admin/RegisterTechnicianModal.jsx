@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { registerTechnician } from "../../api/adminApi";
 
 export default function RegisterTechnicianModal({ onClose, onCreated }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successInfo, setSuccessInfo] = useState(null);
@@ -81,6 +81,15 @@ export default function RegisterTechnicianModal({ onClose, onCreated }) {
                   type="text"
                   value={form.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
+                  className="w-full mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-500">Address (optional)</label>
+                <input
+                  type="text"
+                  value={form.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
                   className="w-full mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm"
                 />
               </div>

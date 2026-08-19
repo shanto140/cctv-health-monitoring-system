@@ -14,7 +14,7 @@ const processQueue = (error) => {
 };
 
 const isAuthRoute = (url = "") =>
-  url.includes("/auth/login") || url.includes("/auth/refresh") || url.includes("/auth/register") || url.includes("/auth/me");
+  url.includes("/auth/login") || url.includes("/auth/refresh") || url.includes("/auth/register");
 
 api.interceptors.response.use(
   (response) => response,

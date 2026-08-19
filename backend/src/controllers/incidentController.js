@@ -38,7 +38,7 @@ export const createIncident = async (req, res) => {
 };                                                             
 
 
-// ---------- Get Incidents (list + filter + pagination) ----------
+
 export const getIncidents = async (req, res) => {
   try {
     const { page = 1, limit = 10, status = "", priority = "", cameraName = "" } = req.query;
@@ -56,7 +56,7 @@ export const getIncidents = async (req, res) => {
   }
 };
 
-// ---------- Get Incident By Id ----------
+
 export const getIncidentById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -71,7 +71,7 @@ export const getIncidentById = async (req, res) => {
   }
 };
 
-// ---------- Assign Technician ----------
+
 export const assignTechnician = async (req, res) => {
   try {
     const { id } = req.params;
@@ -116,7 +116,6 @@ export const acceptIncident = async (req, res) => {
 };
 
 
-// ---------- Technician: Reject Incident (কেন reject করছে, সেই কারণ/কমেন্ট আবশ্যক) ----------
 export const rejectIncident = async (req, res) => {
   try {
     const { id } = req.params;
@@ -144,7 +143,6 @@ export const rejectIncident = async (req, res) => {
 };
  
 
-// ---------- Technician: Complete Incident (রেজোলিউশন কমেন্ট ঐচ্ছিক) ----------
 export const completeIncident = async (req, res) => {
   try {
     const { id } = req.params;
@@ -167,7 +165,7 @@ export const completeIncident = async (req, res) => {
   }
 };
 
-// ---------- Technician: My Incidents ----------
+
 export const getMyIncidents = async (req, res) => {
   try {
     const { page = 1, limit = 10, status = "" } = req.query;

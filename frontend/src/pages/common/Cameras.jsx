@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Circle, Search, Plus, Pencil, Trash2 } from "lucide-react";
-import { getCameras, deleteCamera } from "../../api/adminApi";
-import Pagination from "../../components/admin/Pagination";
+import { getCameras } from "../../api/commonApi";
+import { deleteCamera } from "../../api/adminApi";
+import Pagination from "../../components/common/Pagination";
 import AddCameraModal from "../../components/admin/AddCameraModal";
 import EditCameraModal from "../../components/admin/EditCameraModal";
 import DeleteConfirmModal from "../../components/admin/DeleteConfirmModal";
+import { useAuth } from "../../context/AuthContext";
 
 const statusStyle = {
   Online: "bg-emerald-50 text-emerald-600",
@@ -14,6 +16,9 @@ const statusStyle = {
 };
 
 export default function Cameras() {
+  const { user } = useAuth(); // { id, role }
+  const isAdmin = user?.role === "Admin";
+
   const [cameras, setCameras] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -58,16 +63,21 @@ export default function Cameras() {
     }
   };
 
+  // Admin হলে /admin/cameras/:id, Technician হলে /technician/cameras/:id — role অনুযায়ী path
+  const detailPath = (id) => (isAdmin ? `/admin/cameras/${id}` : `/technician/cameras/${id}`);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-slate-800">Cameras</h1>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-700"
-        >
-          <Plus size={16} /> Add Camera
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-700"
+          >
+            <Plus size={16} /> Add Camera
+          </button>
+        )}
       </div>
 
       <div className="flex gap-3">
@@ -81,12 +91,7 @@ export default function Cameras() {
             className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm"
           />
         </div>
-
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
-        >
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm">
           <option value="">All Status</option>
           <option value="Online">Online</option>
           <option value="Offline">Offline</option>
@@ -122,25 +127,21 @@ export default function Cameras() {
                   </td>
                   <td className="px-5 py-3.5 text-right space-x-2">
                     <button
-                      onClick={() => navigate(`/admin/cameras/${cam.id}`)}
+                      onClick={() => navigate(detailPath(cam.id))}
                       className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-700"
                     >
                       Show Detail
                     </button>
-                    <button
-                      onClick={() => setEditingCamera(cam)}
-                      className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
-                      title="Edit"
-                    >
-                      <Pencil size={14} />
-                    </button>
-                    <button
-                      onClick={() => setDeletingCamera(cam)}
-                      className="p-1.5 rounded-lg border border-slate-200 text-red-500 hover:bg-red-50"
-                      title="Delete"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {isAdmin && (
+                      <>
+                        <button onClick={() => setEditingCamera(cam)} className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50" title="Edit">
+                          <Pencil size={14} />
+                        </button>
+                        <button onClick={() => setDeletingCamera(cam)} className="p-1.5 rounded-lg border border-slate-200 text-red-500 hover:bg-red-50" title="Delete">
+                          <Trash2 size={14} />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))
@@ -150,19 +151,13 @@ export default function Cameras() {
         <Pagination page={page} totalPages={totalPages} onPageChange={loadCameras} />
       </section>
 
-      {showAddModal && (
+      {isAdmin && showAddModal && (
         <AddCameraModal onClose={() => setShowAddModal(false)} onCreated={() => loadCameras(1)} />
       )}
-
-      {editingCamera && (
-        <EditCameraModal
-          camera={editingCamera}
-          onClose={() => setEditingCamera(null)}
-          onUpdated={() => loadCameras(page)}
-        />
+      {isAdmin && editingCamera && (
+        <EditCameraModal camera={editingCamera} onClose={() => setEditingCamera(null)} onUpdated={() => loadCameras(page)} />
       )}
-
-      {deletingCamera && (
+      {isAdmin && deletingCamera && (
         <DeleteConfirmModal
           title="Delete Camera"
           message={`Are you sure you want to delete "${deletingCamera.name}"? This camera will be hidden but its history will be preserved.`}

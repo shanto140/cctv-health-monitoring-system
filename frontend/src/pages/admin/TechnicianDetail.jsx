@@ -5,7 +5,7 @@ import {
   getTechnicianDetail,
   getTechnicianWorkHistory,
 } from "../../api/adminApi";
-import Pagination from "../../components/admin/Pagination";
+import Pagination from "../../components/common/Pagination";
 
 const statusStyle = {
   Open: "bg-amber-50 text-amber-600",

@@ -26,8 +26,8 @@ export const completeIncident = async (id, comment) => {
   return res.data;
 };
 
-// ক্যামেরার ডিটেইল (live preview / snapshot দেখানোর জন্য)
-export const getCameraById = async (id) => {
-  const res = await api.get(`/cameras/${id}`);
+
+export const getTechnicianDashboardStats = async () => {
+  const res = await api.get("/technician/dashboard/stats");
   return res.data;
 };

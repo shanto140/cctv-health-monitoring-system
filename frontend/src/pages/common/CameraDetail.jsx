@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Circle } from "lucide-react";
-import { getCameraById, getCameraIssueHistory } from "../../api/adminApi";
-import Pagination from "../../components/admin/Pagination";
+import { getCameraById, getCameraIssueHistory } from "../../api/commonApi";
+import Pagination from "../../components/common/Pagination";
+import { useAuth } from "../../context/AuthContext";
 
 const statusStyle = {
   Online: "bg-emerald-50 text-emerald-600",
@@ -25,6 +26,9 @@ const issueStatusStyle = {
 export default function CameraDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "Admin";
+  const backPath = isAdmin ? "/admin/cameras" : "/technician/cameras";
 
   const [camera, setCamera] = useState(null);
   const [showLive, setShowLive] = useState(false);
@@ -55,10 +59,7 @@ export default function CameraDetail() {
 
   return (
     <div className="space-y-6">
-      <button
-        onClick={() => navigate("/admin/cameras")}
-        className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700"
-      >
+      <button onClick={() => navigate(backPath)} className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700">
         <ArrowLeft size={16} /> Back to Cameras
       </button>
 
@@ -73,9 +74,11 @@ export default function CameraDetail() {
         </span>
       </div>
 
-      {/* Preview area — snapshot default, live toggle-able */}
+      {/* Preview area — snapshot always visible.
+          Live view (which exposes the RTSP stream_url, credentials included)
+          is Admin-only. Technicians only ever see the still snapshot. */}
       <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden relative">
-        {showLive ? (
+        {isAdmin && showLive ? (
           <video src={camera.stream_url} autoPlay controls className="w-full h-full object-cover" />
         ) : (
           <img
@@ -84,20 +87,24 @@ export default function CameraDetail() {
             className="w-full h-full object-cover"
           />
         )}
-        <button
-          onClick={() => setShowLive(!showLive)}
-          className="absolute bottom-3 right-3 px-3 py-1.5 bg-black/60 text-white text-xs rounded-lg hover:bg-black/80"
-        >
-          {showLive ? "Stop Live" : "▶ View Live"}
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setShowLive(!showLive)}
+            className="absolute bottom-3 right-3 px-3 py-1.5 bg-black/60 text-white text-xs rounded-lg hover:bg-black/80"
+          >
+            {showLive ? "Stop Live" : "▶ View Live"}
+          </button>
+        )}
       </div>
 
-      {/* Camera info */}
-      <section className="bg-white rounded-xl border border-slate-200 p-5 grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">IP Address</p>
-          <p className="font-mono text-slate-700">{camera.ip_address || "—"}</p>
-        </div>
+      {/* Camera info — IP Address is Admin-only (network/credential-adjacent info) */}
+      <section className={`bg-white rounded-xl border border-slate-200 p-5 grid gap-4 text-sm ${isAdmin ? "grid-cols-2" : "grid-cols-1"}`}>
+        {isAdmin && (
+          <div>
+            <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">IP Address</p>
+            <p className="font-mono text-slate-700">{camera.ip_address || "—"}</p>
+          </div>
+        )}
         <div>
           <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Added On</p>
           <p className="text-slate-700">{new Date(camera.created_at).toLocaleDateString()}</p>
@@ -125,21 +132,13 @@ export default function CameraDetail() {
               issues.map((issue) => (
                 <tr key={issue.id} className="border-b border-slate-50 last:border-0">
                   <td className="px-5 py-3.5">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${issueBadge[issue.issue_type]}`}>
-                      {issue.issue_type}
-                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${issueBadge[issue.issue_type]}`}>{issue.issue_type}</span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${issueStatusStyle[issue.status]}`}>
-                      {issue.status}
-                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${issueStatusStyle[issue.status]}`}>{issue.status}</span>
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-xs text-slate-500">
-                    {new Date(issue.detected_at).toLocaleString()}
-                  </td>
-                  <td className="px-5 py-3.5 font-mono text-xs text-slate-500">
-                    {issue.resolved_at ? new Date(issue.resolved_at).toLocaleString() : "—"}
-                  </td>
+                  <td className="px-5 py-3.5 font-mono text-xs text-slate-500">{new Date(issue.detected_at).toLocaleString()}</td>
+                  <td className="px-5 py-3.5 font-mono text-xs text-slate-500">{issue.resolved_at ? new Date(issue.resolved_at).toLocaleString() : "—"}</td>
                 </tr>
               ))
             )}

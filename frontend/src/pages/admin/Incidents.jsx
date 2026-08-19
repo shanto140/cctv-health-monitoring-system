@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Circle } from "lucide-react";
 import { getIncidents } from "../../api/adminApi";
-import Pagination from "../../components/admin/Pagination";
+import Pagination from "../../components/common/Pagination";
 import AssignTechnicianModal from "../../components/admin/AssignTechnicianModal";
 
 const statusStyle = {

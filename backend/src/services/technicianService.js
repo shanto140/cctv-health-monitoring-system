@@ -92,15 +92,15 @@ export const fetchTechniciansWithWorkload = async () => {
   return rows;
 };
 
-export const insertTechnician = async ({ name, email, phone }) => {
+export const insertTechnician = async ({ name, email, phone, address }) => {
   const tempPassword = crypto.randomBytes(4).toString("hex"); // TODO: bcrypt দিয়ে hash করো
 
   const [result] = await db.query(
-    `INSERT INTO technicians (name, email, phone, password, is_active) VALUES (?, ?, ?, ?, TRUE)`,
-    [name, email, phone || null, tempPassword]
+    `INSERT INTO technicians (name, email, phone, address, password, is_active) VALUES (?, ?, ?, ?, ?, TRUE)`,
+    [name, email, phone || null, address || null, tempPassword]
   );
 
-  return { id: result.insertId, name, email, phone, tempPassword };
+  return { id: result.insertId, name, email, phone, address, tempPassword };
 };
 
 export const setTechnicianActiveStatus = async (id, isActive) => {

@@ -58,11 +58,11 @@ export const getAssignableTechnicians = async (req, res) => {
 
 export const registerTechnician = async (req, res) => {
   try {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, address } = req.body;
     if (!name || !email) {
       return res.status(400).json({ message: "name and email are required" });
     }
-    const technician = await insertTechnician({ name, email, phone });
+    const technician = await insertTechnician({ name, email, phone, address });
     res.status(201).json(technician);
   } catch (err) {
     console.error(err);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Video, Wifi, AlertOctagon, Users, Circle } from "lucide-react";
 import { getDashboardStats, getActiveCameraIssues } from "../../api/adminApi";
-import Pagination from "../../components/admin/Pagination";
+import Pagination from "../../components/common/Pagination";
 import CreateIncidentModal from "../../components/admin/CreateIncidentModal";
 
 import {

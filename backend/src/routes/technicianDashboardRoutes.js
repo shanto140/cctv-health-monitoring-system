@@ -1,10 +1,10 @@
 import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
-import { getEventHistory } from "../controllers/eventHistoryController.js";
+import { getTechnicianDashboardStats } from "../controllers/technicianDashboardController.js";
 
 const router = express.Router();
 
-router.get("/", authMiddleware, roleMiddleware("Admin"), getEventHistory);
+router.get("/stats", authMiddleware, roleMiddleware("Technician"), getTechnicianDashboardStats);
 
 export default router;

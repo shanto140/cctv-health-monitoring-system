@@ -17,26 +17,20 @@ export const createIncident = async (payload) => {
   return res.data;
 };
 
-export const getCameras = async ({ page = 1, limit = 10, search = "", status = "" } = {}) => {
-  const res = await api.get("/cameras", { params: { page, limit, search, status } });
-  return res.data;
-};
+// export const getCameras = async ({ page = 1, limit = 10, search = "", status = "" } = {}) => {
+//   const res = await api.get("/cameras", { params: { page, limit, search, status } });
+//   return res.data;
+// };
 
-export const getCameraById = async (id) => {
-  const res = await api.get(`/cameras/${id}`);
-  return res.data;
-};
+// export const getCameraById = async (id) => {
+//   const res = await api.get(`/cameras/${id}`);
+//   return res.data;
+// };
 
-// পুরো সিস্টেমের ঘটনার টাইমলাইন (US-15: Event History)
-export const getEventHistory = async ({ page = 1, limit = 15, cameraId = "", eventType = "" } = {}) => {
-  const res = await api.get("/event-history", { params: { page, limit, cameraId, eventType } });
-  return res.data;
-};
-
-export const getCameraIssueHistory = async (id, page = 1, limit = 10) => {
-  const res = await api.get(`/cameras/${id}/issues`, { params: { page, limit } });
-  return res.data;
-};
+// export const getCameraIssueHistory = async (id, page = 1, limit = 10) => {
+//   const res = await api.get(`/cameras/${id}/issues`, { params: { page, limit } });
+//   return res.data;
+// };
 
 export const createCamera = async (payload) => {
   const res = await api.post("/cameras", payload);
